@@ -1,0 +1,47 @@
+body {
+    width: 1024px;
+    height: 512px;
+    margin: 0px auto;
+    margin-top: 25vh;
+}
+
+#render {
+    display: grid;
+    justify-content: center;
+}
+
+.app {
+    width: 400px;
+    border: 1px solid #e6e6e6;
+    border-radius: 5px;
+    padding: 25px;
+    background-color: white;
+    display: grid;
+    gap: 25px;
+}
+
+.app:hover {
+    box-shadow: 0 4px 24px 0 rgba(0,0,0,.12);
+}
+
+.app__label {
+    font-size: 30px;
+    text-align: center;
+}
+
+.app__link {
+    color: #9299a2;
+    cursor: pointer;
+}
+
+.app__link:hover {
+    color: #3d7ab6;
+}
+
+.app__input {
+    outline: none;
+    height: 25px;
+    font-size: 20px;
+    border: 0px;
+    border-bottom: 1px solid #ffdb4d;
+}
