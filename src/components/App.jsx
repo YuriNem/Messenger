@@ -1,4 +1,7 @@
 import React from 'react';
+import axios from 'axios';
+
+import 'babel-polyfill';
 
 import './style.scss';
 
@@ -7,6 +10,13 @@ export default class App extends React.Component {
         formType: 'Sign in',
         email: '',
         password: '',
+    }
+
+    onSubmitForm = formType => async event => {
+        event.preventDefault();
+
+        const { email, password } = this.state;
+        await axios.post(`/${formType.toLowerCase().replace(' ', '')}`, { email, password });
     }
 
     onClickFormType = formType => event => {
@@ -27,15 +37,15 @@ export default class App extends React.Component {
         const { formType, email, password } = this.state;
 
         return (
-            <form className="app">
+            <form className="app" onSubmit={this.onSubmitForm(formType)}>
                 {
                     formType === 'Sign in' ?
                     <label className="app__label">
-                        Sign in / <a className="app__link" onClick={this.onClickFormType('Log in')}>Log in</a>
+                        Sign in / <a className="app__link" onClick={this.onClickFormType('Sign up')}>Sign up</a>
                     </label>
                     :
                     <label className="app__label">
-                        <a className="app__link" onClick={this.onClickFormType('Sign in')}>Sign in</a> / Log in
+                        <a className="app__link" onClick={this.onClickFormType('Sign in')}>Sign in</a> / Sign up
                     </label>
                 }
                 <input 
@@ -52,6 +62,7 @@ export default class App extends React.Component {
                 placeholder="Password" 
                 type="password" 
                 />
+                <button className="app__button">{formType}</button>
             </form>
         );
     }
