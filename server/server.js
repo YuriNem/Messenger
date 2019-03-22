@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const fs = require('fs');
 const util = require('util');
 
@@ -15,6 +16,14 @@ app.get('/dist/main.js', async (req, res) => {
     const js = await readFilePromise('./dist/main.js');
     res.writeHead(200, { 'Content-Type': 'text/javascript' });
     res.end(js);
+});
+
+app.use(bodyParser.json());
+
+app.post('/signin', (req, res) => {
+    const { email, password } = req.body;
+    console.log(email, password);
+    res.end();
 });
 
 app.listen(process.env.PORT || 3000, () => console.log('Server is working'));
