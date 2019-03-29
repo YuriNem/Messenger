@@ -1,64 +1,48 @@
 import React from 'react';
-import axios from 'axios';
-
-import 'babel-polyfill';
 
 import './style.scss';
 
 export default class App extends React.Component {
-    state = {
-        formType: 'Sign in',
-        email: '',
-        password: '',
-    }
-
-    onSubmitForm = formType => async event => {
-        event.preventDefault();
-
-        const { email, password } = this.state;
-        await axios.post(`/${formType.toLowerCase().replace(' ', '')}`, { email, password });
-    }
-
-    onClickFormType = formType => event => {
-        event.preventDefault();
-
-        this.setState({ formType, email: '', password: '' });
-    }
-
-    onChangeEmail = event => {
-        this.setState({ email: event.target.value });
-    }
-
-    onChangePassword = event => {
-        this.setState({ password: event.target.value });
-    }
-
     render() {
-        const { formType, email, password } = this.state;
+        const { 
+            formType, 
+            email, 
+            password, 
+            asyncSubmitForm, 
+            asyncClickFormType, 
+            asyncChangeEmail, 
+            asyncChangePassword, 
+        } = this.props;
 
         return (
-            <form className="app" onSubmit={this.onSubmitForm(formType)}>
+            <form className="app" onSubmit={event => asyncSubmitForm(event)}>
                 {
                     formType === 'Sign in' ?
                     <label className="app__label">
-                        Sign in / <a className="app__link" onClick={this.onClickFormType('Sign up')}>Sign up</a>
+                        Sign in / <a 
+                        className="app__link" 
+                        onClick={() => asyncClickFormType({ formType: 'Sign up' })}
+                        >Sign up</a>
                     </label>
                     :
                     <label className="app__label">
-                        <a className="app__link" onClick={this.onClickFormType('Sign in')}>Sign in</a> / Sign up
+                        <a 
+                        className="app__link" 
+                        onClick={() => asyncClickFormType({ formType: 'Sign in' })}
+                        >Sign in</a> / Sign up
                     </label>
                 }
                 <input 
                 className="app__input" 
                 value={email} 
-                onChange={this.onChangeEmail} 
+                onChange={event => asyncChangeEmail({ email: event.target.value })} 
                 placeholder="Email" 
                 type="email" 
                 />
                 <input 
                 className="app__input" 
                 value={password} 
-                onChange={this.onChangePassword} 
+                onChange={event => asyncChangePassword({ password: event.target.value })} 
                 placeholder="Password" 
                 type="password" 
                 />
