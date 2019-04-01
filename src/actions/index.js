@@ -1,5 +1,6 @@
 import { createAction } from 'redux-actions';
 import axios from 'axios';
+const socket = new WebSocket("ws://localhost:8081");
 
 import 'babel-polyfill';
 

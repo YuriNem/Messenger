@@ -13,6 +13,8 @@ const initState = {
     formType: 'Sign in',
     email: '',
     password: '',
+    message: '',
+    dialogues: [],
 };
 
 const store = createStore(
