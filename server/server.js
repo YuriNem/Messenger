@@ -22,6 +22,17 @@ const dbUsers = [{
     email: 'PsychoactivePie@gmail.com',
     password: 'qwerty123',
     session: '',
+    dialogues: [
+        {
+            user: '',
+            messages: [
+                {
+                    sender: '',
+                    message: '',
+                },
+            ],
+        },
+    ],
 }];
 
 const getUserFromDBUsers = user => 

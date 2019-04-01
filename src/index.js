@@ -7,7 +7,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import thunk from 'redux-thunk';
 import { Provider } from 'react-redux';
 
-import AppContainer from './containers/App.js';
+import App from './components/App.jsx';
 
 const initState = {
     formType: 'Sign in',
@@ -25,7 +25,7 @@ const renderDiv = document.getElementById('render');
 
 ReactDOM.render(
     <Provider store={store}>
-        <AppContainer/>
+        <App/>
     </Provider>,
     renderDiv,
 );

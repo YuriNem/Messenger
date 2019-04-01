@@ -6,15 +6,15 @@ import {
     asyncChangePassword,
 } from '../actions';
 
-import App from '../components/App.jsx';
+import Form from '../components/Form/Form.jsx';
 
 const mapStateToProps = state => state;
 
-const AppContainer = connect(mapStateToProps, { 
+const FormContainer = connect(mapStateToProps, { 
     asyncSubmitForm, 
     asyncClickFormType, 
     asyncChangeEmail, 
     asyncChangePassword,
-})(App);
+})(Form);
 
-export default AppContainer;
+export default FormContainer;
