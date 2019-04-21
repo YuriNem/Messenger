@@ -3,8 +3,9 @@ import { createAction } from 'redux-actions';
 import axios from 'axios';
 import 'babel-polyfill';
 
-const url = location.href.slice(0, location.href.length - 1).split('//')[1];
-const socket = new WebSocket(`wss://${url}`);
+const HOST = location.origin.replace(/^http/, 'ws');
+const socket = new WebSocket(HOST);
+socket.onopen = () => console.log('ONLINE');
 
 export const setError = createAction('SET_ERROR');
 export const setUser = createAction('SET_USER');
