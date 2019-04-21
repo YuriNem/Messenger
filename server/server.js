@@ -72,14 +72,15 @@ wss.on('connection', ws => {
         }
     
         usersOnline[user.username] = ws;
+        console.log(usersOnline);
     
         ws.on('message', async message => {
             const { username1, username2, text } = JSON.parse(message);
-            console.log(JSON.parse(message));
+            console.log(Object.keys(usersOnline));
     
             if (username2 in usersOnline) {
                 console.log(username2);
-                usersOnline[username2].send(JSON.stringify({ username1, text }));
+                usersOnline[username1].send(JSON.stringify({ username1, text }));
             }
            
             const [dialogue] = [

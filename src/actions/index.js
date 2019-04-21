@@ -61,6 +61,5 @@ export const asyncSendMessage = ({ username: username2, text }) =>
     };
 
 socket.onmessage = function(event) {
-    var incomingMessage = event.data;
-    console.log(incomingMessage);
+    console.log(1);
 };
