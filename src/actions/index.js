@@ -24,7 +24,7 @@ export const asyncSign = ({ action, email, password, username }) =>
     async (dispatch) => {
         const result = await axios.post(
             `/${action.toLowerCase().replace(' ', '')}`,
-            { email, password, username, id: (localStorage.getItem('id')).id },
+            { email, password, username, id: JSON.parse(localStorage.getItem('id')).id },
         );
 
         if (result.data.error) {
@@ -61,5 +61,6 @@ export const asyncSendMessage = ({ username: username2, text }) =>
     };
 
 socket.onmessage = function(event) {
+    console.log(event.data);
     localStorage.setItem('id', event.data);
 };

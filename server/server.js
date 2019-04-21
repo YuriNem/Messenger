@@ -78,6 +78,8 @@ app.post('/signin', async (req, res) => {
         res.json({ error: 'Uncorrect email or password' });
     }
 
+    console.log(userData.id);
+
     userId[user.username] = userData.id;
 
     usersOnline[userData.id].on('message', async message => {
