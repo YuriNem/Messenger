@@ -78,6 +78,7 @@ wss.on('connection', ws => {
             console.log(JSON.parse(message));
     
             if (username2 in usersOnline) {
+                console.log(username2);
                 usersOnline[username2].send(JSON.stringify({ username1, text }));
             }
            
