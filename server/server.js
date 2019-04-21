@@ -87,7 +87,7 @@ app.post('/signin', async (req, res) => {
         console.log(Object.keys(usersOnline));
 
         if (username2 in userId) {
-            usersOnline[userId[user.username]].send(JSON.stringify({ username1, text }));
+            usersOnline[userId[username2]].send(JSON.stringify({ username1, text }));
         }
        
         const [dialogue] = [
