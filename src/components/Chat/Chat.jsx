@@ -1,25 +1,57 @@
 import React from 'react';
 
-import './style.scss';
+import './Chat.scss';
 
-const Chat = ({ messages, message, asyncChangeMessage }) => {
-    return (
-        <div className="chat">
-            <div className="chat__messages">{messages}</div>
-            <div className="chat__form">
-                <input
-                className="chat__input"
-                value={message}
-                onChangeMessage={
-                    event => asyncChangeMessage({ message: event.target.value })
-                }
-                placeholder="Write a message..."
-                type="text"
-                />
-                <button className="chat__button">Send</button>
+import MessagesContainer from '../../containers/Messages.js';
+import ChatFormContainer from '../../containers/ChatForm.js';
+
+class Chat extends React.Component {
+    componentDidMount() {
+        this.getMessages();
+    }
+
+    componentDidUpdate(prevProps) {
+        const {
+			match: {
+				params: { username },
+            },
+        } = this.props;
+        const {
+			match: {
+				params: { username: prevUsername },
+            },
+        } = prevProps;
+        
+        if (username !== prevUsername) {
+            this.getMessages();
+        }
+    }
+
+    getMessages() {
+        const {
+            asyncGetMessages,
+			match: {
+				params: { username },
+            },
+        } = this.props;
+        
+        asyncGetMessages({ username });
+    }
+
+    render() {
+        const {
+			match: {
+				params: { username },
+            },
+        } = this.props;
+
+        return (
+            <div className="chat">
+                <MessagesContainer />
+                <ChatFormContainer username={username} />
             </div>
-        </div>
-    );
+        );
+    }
 }
 
 export default Chat;

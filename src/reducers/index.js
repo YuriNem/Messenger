@@ -2,32 +2,36 @@ import { handleActions } from 'redux-actions';
 import * as actions from '../actions';
 import { combineReducers } from 'redux';
 
-const formType = handleActions({
-    [actions.clickFormType](state, { payload: { formType } }) {
-        return formType;
-    },
-}, 'Sign in');
-
-const email = handleActions({
-    [actions.changeEmail](state, { payload: { email } }) {
-        return email;
-    },
-    [actions.clickFormType](state, { payload: { formType } }) {
-        return '';
+const error = handleActions({
+    [actions.setError](state, { payload: { error } }) {
+        return error;
     },
 }, '');
 
-const password = handleActions({
-    [actions.changePassword](state, { payload: { password } }) {
-        return password;
-    },
-    [actions.clickFormType](state, { payload: { formType } }) {
-        return '';
+const username = handleActions({
+    [actions.setUser](state, { payload: { username } }) {
+        return username;
     },
 }, '');
+
+const dialogues = handleActions({
+    [actions.setUser](state, { payload: { dialogues } }) {
+        return dialogues;
+    },
+}, []);
+
+const messages = handleActions({
+    [actions.setMessages](state, { payload: { messages } }) {
+        return messages;
+    },
+    [actions.addMessage](state, { payload: { username, text } }) {
+        return [...state, { username, text }];
+    }
+}, []);
 
 export default combineReducers({
-    formType,
-    email,
-    password,
+    error,
+    username,
+    dialogues,
+    messages,
 });

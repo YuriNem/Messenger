@@ -1,0 +1,34 @@
+.dialogues {
+    overflow-y: scroll;
+}
+
+.dialogues__link {
+    display: block;
+    text-decoration: none;
+    color: black;
+}
+
+.dialogues__link_active {
+    background-color: #6490b1;
+}
+
+.dialogues__link_active > .dialogue:hover {
+    background-color: #6490b1;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: whitesmoke; 
+}
+
+::-webkit-scrollbar-thumb {
+    background: gainsboro;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: gray; 
+}

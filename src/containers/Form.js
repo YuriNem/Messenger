@@ -1,20 +1,16 @@
 import { connect } from 'react-redux';
 import {
-    asyncClickFormType,
-    asyncChangeEmail,
-    asyncChangePassword,
-    asyncSubmitForm,
+    asyncSign,
+    asyncIsAvailableUsername,
 } from '../actions';
 
 import Form from '../components/Form/Form.jsx';
 
-const mapStateToProps = state => state;
+const mapStateToProps = ({ error }) => ({ error });
 
 const FormContainer = connect(mapStateToProps, {
-    asyncClickFormType,
-    asyncChangeEmail,
-    asyncChangePassword,
-    asyncSubmitForm,
+    asyncSign,
+    asyncIsAvailableUsername,
 })(Form);
 
 export default FormContainer;

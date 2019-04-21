@@ -1,9 +1,18 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const fs = require('fs');
 const util = require('util');
+const bodyParser = require('body-parser');
 const http = require('http');
 const WebSocket = require('ws');
+
+const apiKey = '684d8166ab9b2d19c7de59ad2c9b7aba-3fb021d1-37ad864f';
+const domain = 'sandbox1fa2763dfc61402a9985084e4b0a15e7.mailgun.org';
+const mailgun = require('mailgun-js')({ apiKey, domain });
+const MailComposer = require('nodemailer/lib/mail-composer');
+
+const mongoose = require('mongoose');
+const User = require('./user.js');
+const Dialogue = require('./dialogue.js');
 
 const app = express();
 const readFilePromise = util.promisify(fs.readFile);
@@ -20,101 +29,166 @@ app.get('/dist/main.js', async (req, res) => {
     res.end(js);
 });
 
-const dbUsers = [{
-    email: 'PsychoactivePie@gmail.com',
-    password: 'qwerty123',
-    session: '',
-    name: 'Yuri Nemushkin',
-    dialogues: ['Some User'],
-}, {
-    email: 'SomeUser@gmail.com',
-    password: 'password123',
-    session: '',
-    name: 'Some User',
-    dialogues: ['Yuri Nemushkin'],
-}];
-
-const dbDialogue = [{
-    name1: 'Yuri Nemushkin',
-    name2: 'Some User',
-    messages: [
-        {
-            sender: 'Yuri Nemushkin',
-            message: 'Hi',
-        },
-        {
-            sender: 'Some User',
-            message: 'Bye',
-        },
-    ],
-}];
-
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
-
-const usersOnline = {};
-
-const generateSessionID = () => Math.floor(Math.random() * 1000) + 1;
-
-const getUserFromDBUsersByName = name => 
-    dbUsers.find(user => user.name === name);
-
-const getDialogueFromDBDialogue = ({ name1, name2 }) =>
-    dbDialogue.find(dialogue =>
-        (dialogue.name1 === name1 && dialogue.name2 === name2)
-        ||
-        (dialogue.name2 === name1 && dialogue.name1 === name2)
-    );
-
-wss.on('connection', ws => {
-    const sessionID = generateSessionID();
-    usersOnline[sessionID] = ws;
-    ws.send({ sessionID });
-
-    ws.on('message', ({ sender, receiver, message }) => {
-       const { sessionID } = getUserFromDBUsersByName(receiver);
-       if (usersOnline[sessionID]) {
-           usersOnline[sessionID].send({ sender, message });
-       }
-
-       const dialogueFromDBDialogue = getDialogueFromDBDialogue({ 
-           name1: sender,
-           name2: receiver,
-        });
-        dialogueFromDBDialogue.push({ sender, message });
-    });
-
-    ws.on('close', () => {
-        delete usersOnline[sessionID];
-    });
-});
+server.listen(process.env.PORT || 3000, () => console.log('Server is working'));
 
 app.use(bodyParser.json());
 
-const getUserFromDBUsers = ({ email, password }) => 
-    dbUsers.find(user => user.email === email && user.password === password);
-
-app.post('/signin', async (req, res) => {
+app.post('/username', async (req, res) => {
     const userData = req.body;
-    const userFromDBUsers = getUserFromDBUsers(userData);
-    if (userFromDBUsers) {
-        userFromDBUsers.session = userData.session;
-        res.setHeader('Set-Cookie', `session=${session}`);
+    const [user] = await User.find(userData);
 
-        const { name, dialogues } = userFromDBUsers;
-        res.setHeader('Content-Type', 'text/json');
-        res.end(JSON.stringify({ name, dialogues }));
+    if (user) {
+        res.setHeader('Content-Type', 'text');
+        res.end('This username is not available');
     } else {
-        res.end();
+        res.setHeader('Content-Type', 'text');
+        res.end('');
     }
 });
 
-app.post('/dialogue', async (req, res) => {
-    const dialogueData = req.body;
-    const dialogueFromDBDialogue = getDialogueFromDBDialogue(dialogueData);
-    const { messages } = dialogueFromDBDialogue;
-    res.setHeader('Content-Type', 'text/json');
-    res.end(JSON.stringify({ messages }));
+const wss = new WebSocket.Server({ server });
+const usersOnline = {};
+
+wss.on('connection', ws => {
+    console.log('WS');
+
+    app.post('/signin', async (req, res) => {
+        const userData = req.body;
+        const [user] = await User.find({
+            email: userData.email,
+            password: userData.password,
+        });
+    
+        if (user && user.active) {
+            res.setHeader('Content-Type', 'text/json');
+            res.json({ username: user.username, dialogues: user.dialogues });
+        } else if (user) {
+            res.setHeader('Content-Type', 'text/json');
+            res.json({ error: 'Unconfirmed email' });
+        } else {
+            res.setHeader('Content-Type', 'text/json');
+            res.json({ error: 'Uncorrect email or password' });
+        }
+    
+        usersOnline[user.username] = ws;
+    
+        ws.on('message', async message => {
+            const { username1, username2, text } = JSON.parse(message);
+            console.log(JSON.parse(message));
+    
+            if (username2 in usersOnline) {
+                usersOnline[username2].send(JSON.stringify({ username1, text }));
+            }
+           
+            const [dialogue] = [
+                ...await Dialogue.find({ username1, username2 }), 
+                ...await Dialogue.find({
+                    username1: username2,
+                    username2: username1,
+                }),
+            ];
+    
+            const { messages } = dialogue;
+            
+            await Dialogue.updateOne({
+                username1: dialogue.username1,
+                username2: dialogue.username2,
+            }, [ ...messages, { username1, text } ]);
+        });
+    
+        ws.on('close', () => {
+            delete usersOnline[user.username];
+        });
+    });
 });
 
-server.listen(process.env.PORT || 3000, () => console.log('Server is working'));
+app.post('/signup', async (req, res) => {
+    const userData = req.body;
+    const [userWithEmail] = await User.find({
+        email: userData.email,
+    });
+
+    if (userWithEmail) {
+        res.setHeader('Content-Type', 'text/json');
+        res.json({ error: 'Email already taken' });
+        return;
+    }
+
+    const user = new User();
+    user.email = userData.email;
+    user.password = userData.password;
+    user.username = userData.username;
+    user.dialogues = [];
+    user.active = false;
+    user.id = Math.random();
+    await user.save();
+
+    const data = {
+        from: 'Excited User <me@samples.mailgun.org>',
+        to: user.email,
+        subject: 'Confirm email',
+        text: 'Confirm email',
+        html: `<a href="http://${req.headers.host}/confirm/${user.id}">Click to confirm email</a>`,
+    };
+
+    const mail = new MailComposer(data);
+ 
+    mail.compile().build((err, message) => {
+ 
+        const dataToSend = {
+            to: user.email,
+            message: message.toString('ascii'),
+        };
+
+        mailgun.messages().sendMime(dataToSend, (sendError, body) => {
+            if (sendError) {
+                console.log(sendError);
+                return;
+            }
+        });
+    });
+
+    res.setHeader('Content-Type', 'text/json');
+    res.json({ error: 'Confirm email' });
+});
+
+app.get('/confirm/:id', async (req, res) => {
+    const [user] = await User.find({
+        id: req.params.id,
+    });
+
+    if (user) {
+        await User.updateOne({
+            id: req.params.id,
+        }, { active: true });
+
+        res.setHeader('Content-Type', 'text/json');
+        res.end('Confirmed');
+    } else {
+        res.setHeader('Content-Type', 'text');
+        res.end('Error');
+    }
+});
+
+app.post('/messages', async (req, res) => {
+    const dialogueData = req.body;
+    const [dialogue] = [
+        ...await Dialogue.find(dialogueData), 
+        ...await Dialogue.find({
+            username1: dialogueData.username2,
+            username2: dialogueData.username1,
+        }),
+    ];
+    const { messages } = dialogue;
+    res.setHeader('Content-Type', 'text/json');
+    res.json(messages);
+});
+
+const dbRoute = 'mongodb://YuriNem:dbyn97@ds123753.mlab.com:23753/yuridb';
+mongoose.connect(
+    dbRoute,
+    { useNewUrlParser: true },
+);
+const db = mongoose.connection;
+db.once('open', () => console.log("Connected to the database"));

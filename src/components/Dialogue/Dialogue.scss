@@ -1,0 +1,13 @@
+.dialogue {
+    width: 246px;
+    height: 64px;
+    box-sizing: border-box;
+    padding: 20px 50px;
+    font-size: 18px;
+    transition: background-color .25s ease;
+    cursor: pointer;
+}
+
+.dialogue:hover {
+    background: #f2f6fa;
+}
