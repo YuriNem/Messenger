@@ -4,7 +4,7 @@ import axios from 'axios';
 import 'babel-polyfill';
 
 const url = location.href.slice(0, location.href.length - 1).split('//')[1];
-const socket = new WebSocket(`ws://${url}`);
+const socket = new WebSocket(`wss://${url}`);
 
 export const setError = createAction('SET_ERROR');
 export const setUser = createAction('SET_USER');
