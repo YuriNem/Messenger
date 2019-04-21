@@ -49,59 +49,63 @@ app.post('/username', async (req, res) => {
 
 const wss = new WebSocket.Server({ server });
 const usersOnline = {};
+const userId = {};
 
 wss.on('connection', ws => {
     console.log('WS');
+    const id = Math.random();
+    ws.send(JSON.stringify({id}))
+    usersOnline[id] = ws;
 
-    app.post('/signin', async (req, res) => {
-        const userData = req.body;
-        const [user] = await User.find({
-            email: userData.email,
-            password: userData.password,
-        });
     
-        if (user && user.active) {
-            res.setHeader('Content-Type', 'text/json');
-            res.json({ username: user.username, dialogues: user.dialogues });
-        } else if (user) {
-            res.setHeader('Content-Type', 'text/json');
-            res.json({ error: 'Unconfirmed email' });
-        } else {
-            res.setHeader('Content-Type', 'text/json');
-            res.json({ error: 'Uncorrect email or password' });
+});
+
+app.post('/signin', async (req, res) => {
+    const userData = req.body;
+    const [user] = await User.find({
+        email: userData.email,
+        password: userData.password,
+    });
+
+    if (user && user.active) {
+        res.setHeader('Content-Type', 'text/json');
+        res.json({ username: user.username, dialogues: user.dialogues });
+    } else if (user) {
+        res.setHeader('Content-Type', 'text/json');
+        res.json({ error: 'Unconfirmed email' });
+    } else {
+        res.setHeader('Content-Type', 'text/json');
+        res.json({ error: 'Uncorrect email or password' });
+    }
+
+    userId[user.username] = userData.id;
+
+    usersOnline[userData.id].on('message', async message => {
+        const { username1, username2, text } = JSON.parse(message);
+        console.log(Object.keys(usersOnline));
+
+        if (username2 in userId) {
+            usersOnline[userId[user.username]].send(JSON.stringify({ username1, text }));
         }
-    
-        usersOnline[user.username] = ws;
-        console.log(usersOnline);
-    
-        ws.on('message', async message => {
-            const { username1, username2, text } = JSON.parse(message);
-            console.log(Object.keys(usersOnline));
-    
-            if (username2 in usersOnline) {
-                console.log(username2);
-                usersOnline[username1].send(JSON.stringify({ username1, text }));
-            }
-           
-            const [dialogue] = [
-                ...await Dialogue.find({ username1, username2 }), 
-                ...await Dialogue.find({
-                    username1: username2,
-                    username2: username1,
-                }),
-            ];
-    
-            const { messages } = dialogue;
-            
-            await Dialogue.updateOne({
-                username1: dialogue.username1,
-                username2: dialogue.username2,
-            }, [ ...messages, { username1, text } ]);
-        });
-    
-        ws.on('close', () => {
-            delete usersOnline[user.username];
-        });
+       
+        const [dialogue] = [
+            ...await Dialogue.find({ username1, username2 }), 
+            ...await Dialogue.find({
+                username1: username2,
+                username2: username1,
+            }),
+        ];
+
+        const { messages } = dialogue;
+        
+        await Dialogue.updateOne({
+            username1: dialogue.username1,
+            username2: dialogue.username2,
+        }, [ ...messages, { username1, text } ]);
+    });
+
+    usersOnline[userData.id].on('close', () => {
+        delete usersOnline[user.username];
     });
 });
 
