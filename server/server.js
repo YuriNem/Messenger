@@ -229,7 +229,7 @@ app.post('/dialogue', async (req, res) => {
     res.end('');
 });
 
-const dbRoute = 'mongodb://YuriNem:dbyn97@ds123753.mlab.com:23753/yuridb';
+const dbRoute = '';
 mongoose.connect(
     dbRoute,
     { useNewUrlParser: true },
