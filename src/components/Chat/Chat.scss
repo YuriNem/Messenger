@@ -2,3 +2,33 @@
     display: grid;
     justify-content: center;
 }
+
+.chat__loading {
+    display: inline-block;
+    width: 200px;
+    box-sizing: border-box;
+    height: 72vh;
+    padding-top: 28vh;
+    margin: 0px auto;
+}
+
+.chat__loading:after {
+    content: " ";
+    display: block;
+    width: 100px;
+    height: 100px;
+    margin: 1px;
+    border-radius: 50%;
+    border: 5px solid #3a6d99;
+    border-color: #3a6d99 transparent #3a6d99 transparent;
+    animation: rotate .5s linear infinite;
+}
+
+@keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+}

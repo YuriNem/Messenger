@@ -1,0 +1,21 @@
+.alert {
+    position: absolute;
+    bottom: 0px;
+    right: 1.3vw;
+    background-color: white;
+    border-left: 1px solid #dfe5ec;
+    border-right: 1px solid #dfe5ec;
+    border-top: 1px solid #d2dbe3;
+    width: 17vw;
+    padding: 5px 10px;
+    box-sizing: border-box;
+    font-size: 15px;
+    overflow: hidden;
+    padding-bottom: 10px;
+}
+
+.alert__username {
+    color: #3a6d99;
+    font-weight: 700;
+    margin-bottom: 5px;
+}

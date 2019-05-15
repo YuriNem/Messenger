@@ -1,9 +1,10 @@
 .message {
     width: 512px;
-    padding: 10px 100px;
+    padding: 10px 50px;
     box-sizing: border-box;
     font-size: 15px;
     margin: 0px auto;
+    overflow-wrap: break-word;
 }
 
 .message__username {

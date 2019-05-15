@@ -13,11 +13,14 @@ import './style.scss';
 
 import AppContainer from './containers/App.js';
 
-const initState = {
+const initState =  {
     error: '',
     username: '',
     dialogues: [],
+    openDialogue: '',
     messages: [],
+    usernames: [],
+    alert: null,
 };
 
 const store = createStore(

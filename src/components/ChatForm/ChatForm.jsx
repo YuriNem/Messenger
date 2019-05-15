@@ -17,8 +17,10 @@ class ChatForm extends React.Component {
         const { input } = this.state;
         const { username, asyncSendMessage } = this.props;
 
-        asyncSendMessage({ username, text: input });
-        this.setState({ input: '' });
+        if (input) {
+            asyncSendMessage({ username, text: input });
+            this.setState({ input: '' });
+        }
     }
 
     render() {
@@ -32,6 +34,8 @@ class ChatForm extends React.Component {
                     type="text"
                     value={input}
                     onChange={this.onChangeInput}
+                    placeholder="Write a message..."
+                    autoComplete="off"
                 />
                 <button className="chat-form__button">Send</button>
             </form>

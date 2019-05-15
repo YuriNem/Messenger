@@ -16,7 +16,17 @@ class Form extends React.Component {
         const { error: prevError } = prevProps;
 
         if (error !== prevError) {
-            this.setState({ error });
+            if (error === 'Confirm email') {
+                this.setState({
+                    error,
+                    action: 'Sign in',
+                    email: '',
+                    password: '',
+                    username: '', 
+                });
+            } else {
+                this.setState({ error });
+            }
         }
 
         const { action, username } = this.state;
@@ -47,7 +57,11 @@ class Form extends React.Component {
         } else if (action === 'Sign in') {
             this.setState({ error: 'Blank fields' });
         } else {
-            this.setState({ error: errorProps || 'Blank fields' });
+            if (email && password && username) {
+                this.setState({ error: errorProps || 'Blank fields' });
+            } else {
+                this.setState({ error: 'Blank fields' });
+            }
         }
     }
 
